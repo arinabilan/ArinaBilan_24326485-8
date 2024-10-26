@@ -19,19 +19,19 @@ public class SolicitudeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
-    private int maxMonths; //plazo maximo en meses
-    private BigDecimal interestRate; //tasa de interes
-    private int maxAmount; //monto maximo en porcentaje (entre 0 y 100)
+    private float maxMonths; //plazo maximo en meses
+    private double interestRate; //tasa de interes
+    private float maxAmount; //monto maximo en porcentaje (entre 0 y 100)
     private int deadline; //plazo solicitado en meses
-    private int amount; //monto solicitado
+    private float amount; //monto solicitado
     private LocalDate date; //fecha de solicitud
-    private int calculatedAmount; //calculo entre monto solicitado y el % de monto maximo - sera cantidad maxima
+    private float calculatedAmount; //calculo entre monto solicitado y el % de monto maximo - sera cantidad maxima
     // de plata que banco puede pasar a cliente, depende de tipo de prestamo(ej: si compras primera vivienda,
     // te pueden financiar solo 80% de esa vivienda)
     private int state; //estado en entero (1,2,3) : 1-pendiente, 2-aprobado, 3-rechazado
 
-    @ManyToOne
-    @JoinColumn(name = "Executive_Id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "Executive_Id", nullable = true)
     private ExecutiveEntity executive; //para saber que ejecutivo vio la solicitud.
 
     @ManyToOne

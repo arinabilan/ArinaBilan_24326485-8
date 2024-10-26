@@ -21,11 +21,13 @@ public class SavingCapacityEntity {
     private int deposits; //suma de depositos mensuales de ultimos 12 meses R73:Depositos periodicos
     private int yearsSavings; //años de antiguidad de la cuenta de ahorro R74:Relacion saldo/Años antiguidad
     private int recentWithdrawals; //suma de retiros en ultimos 6 meses R75:Retiros recientes
-    private int state; //resultado de evaluacion (1,2,3) 1-Aprobacion:Solido, 2-Revision Adicional:Moderado, 3-Rechazo:Insuficiente
+
+    //Se quita el siguiente atributo, porque limita capacidad del cliente sacar credito en futuro
+    //private int state; //resultado de evaluacion (1,2,3) 1-Aprobacion:Solido, 2-Revision Adicional:Moderado, 3-Rechazo:Insuficiente
 
     @OneToOne
     @JoinColumn(nullable = false)
     private ClientEntity client; //esta asociado a id de usuario, cada usuario que va a registrarse tendran sus datos de
     //capacidad de ahorro
-
+    //int a = Math.toIntExact(Math.round(100 / 0.8));
 }

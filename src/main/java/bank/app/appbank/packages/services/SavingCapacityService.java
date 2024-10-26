@@ -20,17 +20,24 @@ public class SavingCapacityService {
     @Autowired
     private ClientDatesRepository clientDatesRepository;
 
-    public void calculateState(Long clientId, Long solicitudeId){
+    public SavingCapacityEntity saveCapacity(SavingCapacityEntity saving) {
+
+        return savingCapacityRepository.save(saving); //SavingCapacityEntity sav =
+        //return calculateState(saving.getClient().getId(), (long)sav.getId());
+    }
+
+    public int calculateState(Long clientId, Long solicitudeId){
+        int estado_resultado = 0;
         int score = 5;
         SavingCapacityEntity capacity = savingCapacityRepository.findByClientId(clientId);
         SolicitudeEntity solicitude = solicitudeRepository.findBySolicitudeId(solicitudeId);
         ClientDatesEntity datesClient =clientDatesRepository.findByClientId(clientId);
-        int calculatedAmount = solicitude.getCalculatedAmount();
+        float calculatedAmount = solicitude.getCalculatedAmount();
         int balance = capacity.getBalance(); //saldo de cliente en su cuenta de ahorro
         Boolean withdrawals = capacity.getWithdrawal(); //si tiene o no historial de ahorro consistente
         int deposits = capacity.getDeposits(); //suma de depositos en ultimos 12 meses de cliente
         int salary = datesClient.getMonthSalary(); //ingreso mensual de cliente
-        double percent = calculatedAmount * 0.1;
+        double percent = calculatedAmount * 0.1; //el saldo debe ser mayor al 10% del monto solicitado
 
         //R71: Saldo Mínimo Requerido
         if (percent < balance){
@@ -59,19 +66,22 @@ public class SavingCapacityService {
         }
 
         if (score < 2){
-            capacity.setState(3); //marcar la capacidad de ahorro como “insuficiente” y proceder a rechazar
+            estado_resultado = 3;
+            // capacity.setState(3); //marcar la capacidad de ahorro como “insuficiente” y proceder a rechazar
         }
 
         if (score > 2 && score < 5){
-            capacity.setState(2); //marcar la capacidad de ahorro como "moderada" e indicar que se requiere una revisión adicional
+            estado_resultado = 2;
+            // capacity.setState(2); //marcar la capacidad de ahorro como "moderada" e indicar que se requiere una revisión adicional
         }
 
         if (score == 5){
-            capacity.setState(1); //reglas, marcar la capacidad de ahorro como “sólida” y continuar con la evaluación del crédito.
+            estado_resultado = 1;
+            // capacity.setState(1); //reglas, marcar la capacidad de ahorro como “sólida” y continuar con la evaluación del crédito.
         }
 
 
-        savingCapacityRepository.save(capacity);
+        return estado_resultado;
 
     }
 }
