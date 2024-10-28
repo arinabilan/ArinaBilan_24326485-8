@@ -20,6 +20,10 @@ public class SavingCapacityService {
     @Autowired
     private ClientDatesRepository clientDatesRepository;
 
+    public SavingCapacityEntity getByClientId(Long clientId) {
+        return savingCapacityRepository.findByClientId(clientId);
+    }
+
     public SavingCapacityEntity saveCapacity(SavingCapacityEntity saving) {
 
         return savingCapacityRepository.save(saving); //SavingCapacityEntity sav =

@@ -6,12 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/documents")
 public class DocumentController {
     @Autowired
     private DocumentService documentService;
+
+    @GetMapping("/")
+    public ResponseEntity<List<DocumentEntity>> getAllDocuments() {
+        List<DocumentEntity> documents = documentService.getAllDocuments();
+        return ResponseEntity.ok(documents);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentEntity> findDocumentById(@PathVariable Long id){

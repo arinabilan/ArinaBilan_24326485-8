@@ -18,6 +18,22 @@ public class ExecutiveService {
         return client.orElse(null); // Uso seguro de Optional
     }
 
+    public ExecutiveEntity getByEmailAndPassword(String email, String password){
+        Optional<ExecutiveEntity> optionalExecutive = executiveRepository.findByEmail(email);
+
+        if(optionalExecutive.isPresent()){
+            ExecutiveEntity executive = optionalExecutive.get();
+
+            if(executive.getPassword().equals(password)){
+                return executive;
+            } else {
+                throw new IllegalArgumentException("Constraseña incorrecta");
+            }
+        } else {
+            throw new IllegalArgumentException("Email no encontrado");
+        }
+    }
+
     public ExecutiveEntity addExecutive(ExecutiveEntity executive){
         return executiveRepository.save(executive);
     }

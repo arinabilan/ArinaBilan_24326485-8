@@ -11,8 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
-@RequestMapping("/documents")
+@RequestMapping("/api/v1/clientdocuments")
 public class ClientDocumentController {
     @Autowired
     private ClientDocumentService clientDocumentService;
@@ -49,8 +50,9 @@ public class ClientDocumentController {
     *   "file": ...
     * }
     * */
-    @PostMapping("/file/")
-    public ResponseEntity<Boolean> saveClientDocumentWithFile(@RequestParam("client_id") Long client_id, @RequestParam("document_type") Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
+
+    @PostMapping("/file/{client_id}/{document_type}")
+    public ResponseEntity<Boolean> saveClientDocumentWithFile(@PathVariable Long client_id, @PathVariable Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
         Boolean clientDocumentUploaded = clientDocumentService.uploadClientDocument(client_id, document_type, file);
         return ResponseEntity.ok(clientDocumentUploaded);
     }

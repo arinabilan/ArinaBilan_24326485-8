@@ -13,6 +13,12 @@ public class SavingCapacityController {
     @Autowired
     SavingCapacityService savingCapacityService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<SavingCapacityEntity> getCapacityByClientId(@PathVariable Long id) {
+        SavingCapacityEntity savingCapacity = savingCapacityService.getByClientId(id);
+        return ResponseEntity.ok(savingCapacity);
+    }
+
     @PostMapping("/")
     public ResponseEntity<SavingCapacityEntity> createSavingCapacity(@RequestBody SavingCapacityEntity saving) {
         SavingCapacityEntity savingCapacity = savingCapacityService.saveCapacity(saving);

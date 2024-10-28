@@ -14,6 +14,12 @@ public class ClientDatesController {
     @Autowired
     private ClientDatesService clientDatesService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientDatesEntity> getClientDates(@PathVariable Long id) {
+        ClientDatesEntity dates = clientDatesService.getByClientId(id);
+        return ResponseEntity.ok(dates);
+    }
+
     @PostMapping("/")
     public ResponseEntity<ClientDatesEntity> createDates(@RequestBody ClientDatesEntity clientDates) {
         ClientDatesEntity dates = clientDatesService.saveDates(clientDates);

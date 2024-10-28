@@ -5,10 +5,16 @@ import bank.app.appbank.packages.repositories.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class DocumentService {
     @Autowired
     private DocumentRepository documentRepository;
+
+    public ArrayList<DocumentEntity> getAllDocuments() {
+        return (ArrayList<DocumentEntity>) documentRepository.findAll();
+    }
 
     public DocumentEntity findDocumentById(Long id){
         return documentRepository.findDocumentById(id);
