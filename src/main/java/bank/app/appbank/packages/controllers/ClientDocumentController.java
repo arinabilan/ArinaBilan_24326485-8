@@ -41,8 +41,8 @@ public class ClientDocumentController {
         return ResponseEntity.ok(clientDocument);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Boolean> saveClientDocument(@RequestParam("client_id") Long client_id, @RequestParam("document_type") Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
+    @PostMapping("/file/")
+    public ResponseEntity<Boolean> saveClientDocumentWithFile(@RequestParam("client_id") Long client_id, @RequestParam("document_type") Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
         Boolean clientDocumentUploaded = clientDocumentService.uploadClientDocument(client_id, document_type, file);
         return ResponseEntity.ok(clientDocumentUploaded);
     }
