@@ -41,6 +41,14 @@ public class ClientDocumentController {
         return ResponseEntity.ok(clientDocument);
     }
 
+    // Requiere que se envíe el cliente_id, el document_id y el archivo (FormData.append('file', filedata) file nombre de campo, filedata lo del campo file)
+    /*
+    * {
+    *   "client_id": 1,
+    *   "document_type": 1,
+    *   "file": ...
+    * }
+    * */
     @PostMapping("/file/")
     public ResponseEntity<Boolean> saveClientDocumentWithFile(@RequestParam("client_id") Long client_id, @RequestParam("document_type") Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
         Boolean clientDocumentUploaded = clientDocumentService.uploadClientDocument(client_id, document_type, file);
