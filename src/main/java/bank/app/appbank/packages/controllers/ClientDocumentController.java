@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,12 @@ public class ClientDocumentController {
     public ResponseEntity<ClientDocumentEntity> saveClientDocument(@RequestBody ClientDocumentEntity document){
         ClientDocumentEntity clientDocument = clientDocumentService.saveClientDocument(document);
         return ResponseEntity.ok(clientDocument);
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<Boolean> saveClientDocument(@RequestParam("client_id") Long client_id, @RequestParam("document_type") Long document_type, @RequestParam("file") MultipartFile file) throws Exception {
+        Boolean clientDocumentUploaded = clientDocumentService.uploadClientDocument(client_id, document_type, file);
+        return ResponseEntity.ok(clientDocumentUploaded);
     }
 
     @PutMapping("/")
