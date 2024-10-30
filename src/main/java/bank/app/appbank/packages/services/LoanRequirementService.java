@@ -44,4 +44,12 @@ public class LoanRequirementService {
         return loanRequirementRepository.save(loanRequirement);
     }
 
+    public double percentRate(double interestRate){
+        return interestRate * 100;
+    }
+
+    public double year(double month){
+        return Math.floor(month / 12);
+    }
+
 }

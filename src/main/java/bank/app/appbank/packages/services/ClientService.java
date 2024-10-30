@@ -17,6 +17,13 @@ public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
+    public double simulateAmount(double amount, double interesRate, double years ) {
+        double r = interesRate/12/100;
+        double n = years * 12;
+        double pow = Math.pow((1+r), n);
+        return Math.round(amount * ((r*pow)/(pow-1)));
+    }
+
     public ArrayList<ClientEntity> getClients(){
         return (ArrayList<ClientEntity>) clientRepository.findAll();
     }

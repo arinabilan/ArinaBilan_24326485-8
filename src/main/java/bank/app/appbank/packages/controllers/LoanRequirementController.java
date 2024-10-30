@@ -64,4 +64,16 @@ public class LoanRequirementController {
         LoanRequirementEntity updated = loanRequirementService.updateLoanRequirement(loanRequirement);
         return ResponseEntity.ok(updated);
     }
+
+    @GetMapping("/{rate}/rate")
+    public ResponseEntity<Double> percentRate(@PathVariable double rate){
+        double percentRate = loanRequirementService.percentRate(rate);
+        return ResponseEntity.ok(percentRate);
+    }
+
+    @GetMapping("/{month}/years/loan")
+    public ResponseEntity<Double> years(@PathVariable double month){
+        double yearsLoan = loanRequirementService.year(month);
+        return ResponseEntity.ok(yearsLoan);
+    }
 }

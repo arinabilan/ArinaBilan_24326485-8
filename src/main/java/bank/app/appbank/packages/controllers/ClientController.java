@@ -99,4 +99,10 @@ public class ClientController {
         clientService.deleteClient(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{amount}/{interesRate}/{years}")
+    public ResponseEntity<Double> simulateAmount(@PathVariable double amount, @PathVariable double interesRate, @PathVariable double years){
+       double simulate = clientService.simulateAmount(amount,interesRate,years);
+       return ResponseEntity.ok(simulate);
+    }
 }
