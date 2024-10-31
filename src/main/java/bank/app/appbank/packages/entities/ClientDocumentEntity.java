@@ -6,9 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
-@Table(name="client_documents")
+//@Table(name="client_documents")
+@Table(
+        name="client_documents",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"Client_Id", "Document_Id"})}
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,7 +32,8 @@ public class ClientDocumentEntity {
     @JoinColumn(name = "Client_Id", nullable = false)
     private ClientEntity client; //el dicho documento esta asociado a entidad cliente, a un body entero de cliente
 
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "Document_Id", nullable = false)
     private DocumentEntity document; //el dicho documento ingresado por el cliente esta asociado a entidad
     //documento que consiste en entidad-descripcion del documento, tiene id y titulo de documento

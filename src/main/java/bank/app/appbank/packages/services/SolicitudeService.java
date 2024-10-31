@@ -22,12 +22,19 @@ public class SolicitudeService {
         float amount = solicitude.getAmount();
         float maxAmount = solicitude.getMaxAmount();
         float totalAmount = calculateAmount(amount, maxAmount);
+        int years = solicitude.getDeadline();
+        int months = calculateMonths(years);
         solicitude.setCalculatedAmount(totalAmount);
+        solicitude.setDeadline(months);
         return solicitudeRepository.save(solicitude);
     }
 
     float calculateAmount(float amount, float maxAmount){
         return amount * maxAmount;
+    }
+
+    int calculateMonths(int years){
+        return years * 12;
     }
 
     public SolicitudeEntity updateSolicitude(Long id, ExecutiveEntity executive) {
