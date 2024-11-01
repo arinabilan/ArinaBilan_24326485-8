@@ -24,4 +24,10 @@ public class SavingCapacityController {
         SavingCapacityEntity savingCapacity = savingCapacityService.saveCapacity(saving);
         return ResponseEntity.ok(savingCapacity);
     }
+
+    @PutMapping("/")
+    public ResponseEntity<SavingCapacityEntity> updateSavingCapacity(@RequestBody SavingCapacityEntity saving) {
+        SavingCapacityEntity savingCapacity = savingCapacityService.saveCapacity(saving);
+        return ResponseEntity.ok(savingCapacity);
+    }
 }

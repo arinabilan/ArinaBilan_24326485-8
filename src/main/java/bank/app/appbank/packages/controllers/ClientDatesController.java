@@ -25,4 +25,10 @@ public class ClientDatesController {
         ClientDatesEntity dates = clientDatesService.saveDates(clientDates);
         return ResponseEntity.ok(dates);
     }
+
+    @PutMapping("/")
+    public ResponseEntity<ClientDatesEntity> updateDates(@RequestBody ClientDatesEntity clientDates) {
+        ClientDatesEntity dates = clientDatesService.saveDates(clientDates);
+        return ResponseEntity.ok(dates);
+    }
 }
