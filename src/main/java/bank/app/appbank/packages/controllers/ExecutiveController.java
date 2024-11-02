@@ -34,8 +34,6 @@ public class ExecutiveController {
             // Si hay algún problema con la autenticación, retorna un error
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-
-
     }
 
     @PostMapping("/")

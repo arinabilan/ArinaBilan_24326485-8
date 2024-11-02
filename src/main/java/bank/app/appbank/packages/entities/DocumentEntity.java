@@ -20,6 +20,7 @@ public class DocumentEntity {
     @Column(unique = true, nullable = false)
     private Long id;
     private String title;
+    private Boolean minimunRequirements = false;
 
     @ManyToMany(mappedBy = "documents")
    // @JsonBackReference

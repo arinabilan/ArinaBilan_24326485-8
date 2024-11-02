@@ -84,7 +84,6 @@ public class SavingCapacityService {
             // capacity.setState(1); //reglas, marcar la capacidad de ahorro como “sólida” y continuar con la evaluación del crédito.
         }
 
-
         return estado_resultado;
 
     }

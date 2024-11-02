@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -24,6 +25,12 @@ public class DocumentController {
     @GetMapping("/{id}")
     public ResponseEntity<DocumentEntity> findDocumentById(@PathVariable Long id){
         DocumentEntity document = documentService.findDocumentById(id);
+        return ResponseEntity.ok(document);
+    }
+
+    @GetMapping("/byMinimun/{minimum}")
+    public ResponseEntity<ArrayList<DocumentEntity>> findDocumentByMinimunRequirements(@PathVariable Boolean minimum){
+        ArrayList<DocumentEntity> document = documentService.findDocumentByMinimunRequirements(minimum);
         return ResponseEntity.ok(document);
     }
 

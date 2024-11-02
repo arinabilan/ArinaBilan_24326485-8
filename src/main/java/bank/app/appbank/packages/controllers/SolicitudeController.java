@@ -28,10 +28,15 @@ public class SolicitudeController {
         return ResponseEntity.ok(saved);
     }
 
-    @PutMapping("/{id}/")
-    public ResponseEntity<SolicitudeEntity> updateSolicitude(@PathVariable("id") Long id, @RequestBody ExecutiveEntity executive) {
-        SolicitudeEntity updated = solicitudeService.updateSolicitude(id, executive);
+    @PutMapping("/{id}/{state}")
+    public ResponseEntity<SolicitudeEntity> updateSolicitude(@PathVariable("id") Long id, @PathVariable("state") int state, @RequestBody ExecutiveEntity executive) {
+        SolicitudeEntity updated = solicitudeService.updateSolicitude(id, executive, state);
         return ResponseEntity.ok(updated);
     }
 
+    @GetMapping("/evaluate/{id}")
+    public ResponseEntity<SolicitudeEntity> evaluate(@PathVariable("id") Long id) {
+        SolicitudeEntity solicitudes = solicitudeService.EvaluateSolicitude(id);
+        return ResponseEntity.ok(solicitudes);
+    }
 }

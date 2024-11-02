@@ -23,6 +23,9 @@ public class DocumentService {
     public DocumentEntity findDocumentByTitle(String title){
         return documentRepository.findDocumentByTitle(title);
     }
+    public ArrayList<DocumentEntity> findDocumentByMinimunRequirements(Boolean minimunRequirements){
+        return documentRepository.findDocumentsByMinimunRequirements(minimunRequirements);
+    }
 
     public DocumentEntity save(DocumentEntity document){
         return documentRepository.save(document);
