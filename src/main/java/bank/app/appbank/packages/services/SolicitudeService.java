@@ -82,11 +82,13 @@ public class SolicitudeService {
         double relationCuoteSalary = (monthCuote / monthSalary) * 100;
         if (relationCuoteSalary > 35) {
             solicitude.setState(7); // rechazada
+            return solicitudeRepository.save(solicitude);
         }
 
         // 3(R2) - Verifica si tiene buen historial crediticio (DICOM)
         if (clientDates.getDicom()) {
             solicitude.setState(7); // rechazada
+            return solicitudeRepository.save(solicitude);
         }
 
         // 4(R3) - Verificación de estado contractual
@@ -95,18 +97,21 @@ public class SolicitudeService {
                 clientDates.getMonthSalary() - clientDates.getMonthlyDebt() > 500000)
             || (clientDates.getType() == 2 && clientDates.getInitialContract() / 12 > 1 ))) {
             solicitude.setState(7); // rechazada
+            return solicitudeRepository.save(solicitude);
         }
 
         // 5(R4) - Verificación deuda/ingreso
         double relationDebtSalary = ((monthCuote + clientDates.getMonthlyDebt()) / monthSalary) * 100;
         if (relationDebtSalary > 50) {
             solicitude.setState(7); // rechazada
+            return solicitudeRepository.save(solicitude);
         }
 
         // 6(R6) - Verificación edad
         int currentAge = Period.between(LocalDate.now(), clientService.getById(clientId).getBirthday()).getYears();
         if (currentAge + (solicitude.getDeadline() / 12) > 70) {
             solicitude.setState(7); // rechazada
+            return solicitudeRepository.save(solicitude);
         }
 
         solicitude.setState(4); // pre-aprobada
