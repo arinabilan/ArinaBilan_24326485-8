@@ -67,10 +67,10 @@ public class SolicitudeService {
 
         // 1 - Verifica si la documentación mínima requerida + la documentación del tipo de prestamo está completa
         ArrayList<DocumentEntity> documentsMinimun = documentRepository.findDocumentsByMinimunRequirements(true);
-        boolean documentsMinimunRequired = documentsMinimun.contains(documentsClient);
+        boolean documentsMinimunRequired = documentsClient.isEmpty() && documentsMinimun.isEmpty() || documentsMinimun.contains(documentsClient);
         ArrayList<DocumentEntity> documentByLoan = (ArrayList<DocumentEntity>) loanRequirementRepository.findDocumentsByTypeLoanId(clientId);
-        boolean documentsLLoanRequired = documentByLoan.contains(documentsClient);
-        if (!documentsMinimunRequired && !documentsLLoanRequired) {
+        boolean documentsLLoanRequired = documentsClient.isEmpty() && documentByLoan.isEmpty() || documentByLoan.contains(documentsClient);
+        if (!documentsMinimunRequired || !documentsLLoanRequired) {
             solicitude.setState(2);
             return solicitudeRepository.save(solicitude);
         }
@@ -108,7 +108,7 @@ public class SolicitudeService {
         }
 
         // 6(R6) - Verificación edad
-        int currentAge = Period.between(LocalDate.now(), clientService.getById(clientId).getBirthday()).getYears();
+        int currentAge = Period.between(clientService.getById(clientId).getBirthday(), LocalDate.now()).getYears();
         if (currentAge + (solicitude.getDeadline() / 12) > 70) {
             solicitude.setState(7); // rechazada
             return solicitudeRepository.save(solicitude);

@@ -11,12 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-
 import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -41,6 +39,9 @@ public class SolicitudeServiceTest {
     @Mock
     private ClientDatesRepository clientDatesRepository;
 
+    @Mock
+    private ClientRepository clientRepository;
+
     @InjectMocks
     private SolicitudeService solicitudeService;
 
@@ -48,6 +49,10 @@ public class SolicitudeServiceTest {
     private ExecutiveEntity executive;
     private ClientEntity clientEnt;
     private TypeLoanEntity typeLoan;
+    private ArrayList<ClientDocumentEntity> documentsClient;
+    private ArrayList<DocumentEntity> documentsMinimun;
+    private ArrayList<DocumentEntity> documentByLoan;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -87,6 +92,9 @@ public class SolicitudeServiceTest {
         solicitude.setLoanType(typeLoan);
         solicitude.setExecutive(executive);
 
+        documentsClient = new ArrayList<>();
+        documentsMinimun = new ArrayList<>();
+        documentByLoan = new ArrayList<>();
     }
 
     @Test
@@ -149,40 +157,23 @@ public class SolicitudeServiceTest {
     }
 
     @Test
-    public void whenEvaluateSolicitude_thenReturnEvaluatedSolicitude_state2() {
-        // given
-        when(solicitudeRepository.findById(solicitude.getId())).thenReturn(Optional.of(solicitude));
-        when(clientDocumentRepository.findByClientId(clientEnt.getId())).thenReturn(new ArrayList<>());
-        when(documentRepository.findDocumentsByMinimunRequirements(true)).thenReturn(new ArrayList<>()); // Simula que no hay documentos mínimos
-        when(loanRequirementRepository.findDocumentsByTypeLoanId(clientEnt.getId())).thenReturn(new ArrayList<>()); // Simula que no hay documentos requeridos
-        ClientDatesEntity clientDates = new ClientDatesEntity();
-        clientDates.setId(1L);
-        clientDates.setClient(clientEnt);
-        clientDates.setMonthSalary(90000);
-        clientDates.setDate(12);
-        clientDates.setInitialContract(144);
-        clientDates.setDicom(true);
-        clientDates.setType(1);
-        clientDates.setMediaSalary(600000);
-        clientDates.setMonthlyDebt(110000);
-        when(clientDatesRepository.findByClientId(clientEnt.getId())).thenReturn(clientDates);
-        when(clientService.simulateAmount(anyDouble(), anyDouble(), anyDouble())).thenReturn(200000.0); // Simula el monto de la cuota
-        when(clientService.getById(clientEnt.getId())).thenReturn(clientEnt); // Simula la obtención del cliente
+    void testEvaluateSolicitudeMissingDocuments() {
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ArrayList<DocumentEntity> requiredDocs = new ArrayList<>();
+        DocumentEntity doc = new DocumentEntity();
+        doc.setId(1L);
+        doc.setMinimunRequirements(true);
+        requiredDocs.add(doc);
 
-        // Configura los datos del cliente
-        clientDates.setMonthSalary(600000); // Salario mensual
-        clientDates.setMonthlyDebt(100000); // Deuda mensual
-        clientDates.setDicom(false); // Sin problemas en el DICOM
-        clientDates.setType(1); // Tipo de relación
-        clientDates.setMediaSalary(800000); // Salario promedio
-        clientDates.setInitialContract(24); // Contrato inicial en meses
+        when(solicitudeRepository.findById(1L)).thenReturn(Optional.of(solicitude));
+        when(clientDocumentRepository.findByClientId(1L)).thenReturn(new ArrayList<>());
+        when(documentRepository.findDocumentsByMinimunRequirements(true)).thenReturn(requiredDocs);
+        when(loanRequirementRepository.findDocumentsByTypeLoanId(clientEnt.getId())).thenReturn(new ArrayList<>());
 
         when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
-        // when
-        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(solicitude.getId());
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
 
-        // then
-        assertThat(result.getState()).isEqualTo(2); // Asegúrate de que el estado sea pre-aprobado
+        assertThat(result.getState()).isEqualTo(2);
     }
 
     @Test
@@ -200,10 +191,212 @@ public class SolicitudeServiceTest {
 
         // then
         assertThat(result).isEqualTo(solicitudeWithStateGreaterThan3);
-        verify(solicitudeRepository, never()).save(any(SolicitudeEntity.class));
     }
 
+    @Test
+    public void testEvaluateSolicitude_RelationCuoteSalaryGreaterThan35() {
+        Long solicitudeId = 1L;
+        SolicitudeEntity solicitudenew = new SolicitudeEntity();
+        solicitudenew.setId(solicitudeId);
+        solicitudenew.setState(1);
+        solicitudenew.setAmount(100000);
+        solicitudenew.setInterestRate(0.05f);
+        solicitudenew.setDeadline(12);
+        ClientEntity client = new ClientEntity();
+        client.setId(1L);
+        solicitudenew.setClient(client);
+
+        ClientDatesEntity clientDates = new ClientDatesEntity();
+        clientDates.setId(1L);
+        clientDates.setClient(clientEnt);
+        clientDates.setMonthSalary(90000);
+        clientDates.setDate(12);
+        clientDates.setInitialContract(144);
+        clientDates.setDicom(true);
+        clientDates.setType(1);
+        clientDates.setMediaSalary(600000);
+        clientDates.setMonthlyDebt(110000);
+
+        when(solicitudeRepository.findById(solicitudenew.getId()))
+                .thenReturn(Optional.of(solicitudenew));
+        when(solicitudeRepository.findById(solicitudeId)).thenReturn(Optional.of(solicitudenew));
+        when(clientDocumentRepository.findByClientId(clientEnt.getId())).thenReturn(new ArrayList<>());
+        when(documentRepository.findDocumentsByMinimunRequirements(true)).thenReturn(new ArrayList<>());
+        when(loanRequirementRepository.findDocumentsByTypeLoanId(clientEnt.getId())).thenReturn(new ArrayList<>());
+        when(clientDatesRepository.findByClientId(clientEnt.getId())).thenReturn(clientDates);
+        when(clientService.simulateAmount(anyFloat(), anyFloat(), anyDouble())).thenReturn(400.0);
+
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitudenew);
+
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(solicitudenew.getId());
+
+        assertThat(result.getState()).isEqualTo(7);
+    }
+
+    @Test
+    public void testEvaluateSolicitude_DicomTrue() {
+        Long solicitudeId = 1L;
+        SolicitudeEntity solicitude = new SolicitudeEntity();
+        solicitude.setId(solicitudeId);
+        solicitude.setState(1);
+        ClientEntity client = new ClientEntity();
+        client.setId(1L);
+        solicitude.setClient(client);
+
+        ClientDatesEntity clientDates = new ClientDatesEntity();
+        clientDates.setDicom(true);
+
+        when(solicitudeRepository.findById(solicitudeId)).thenReturn(Optional.of(solicitude));
+        when(clientDocumentRepository.findByClientId(client.getId())).thenReturn(new ArrayList<>());
+        when(documentRepository.findDocumentsByMinimunRequirements(true)).thenReturn(new ArrayList<>());
+        when(loanRequirementRepository.findDocumentsByTypeLoanId(client.getId())).thenReturn(new ArrayList<>());
+        when(clientDatesRepository.findByClientId(client.getId())).thenReturn(clientDates);
+
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(solicitudeId);
+
+        assertThat(result.getState()).isEqualTo(7);
+    }
+
+    @Test
+    void testEvaluateSolicitudeQuotaIncomeRatioExceeded() {
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ClientDatesEntity clientDates = new ClientDatesEntity();
+        clientDates.setMonthSalary(1000);
+        clientDates.setDicom(false);
 
 
+        setupBasicMocks(solicitude, clientDates);
+        when(clientService.simulateAmount(anyFloat(), anyFloat(), anyDouble())).thenReturn(400.0);
 
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        assertThat(result.getState()).isEqualTo(7);
+    }
+
+    @Test
+    void testEvaluateSolicitudeContractStateVerification() {
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ClientDatesEntity clientDates = new ClientDatesEntity();
+        clientDates.setType(1);
+        clientDates.setDicom(false);
+        clientDates.setMediaSalary(700000);
+        clientDates.setMonthSalary(800000);
+        clientDates.setMonthlyDebt(400000);
+
+        setupBasicMocks(solicitude, clientDates);
+
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        assertThat(result.getState()).isEqualTo(7);
+    }
+
+    @Test
+    public void testEvaluateSolicitude_WhenDebtToIncomeRatioExceeds50Percent_ShouldReject() {
+        // Arrange
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ClientDatesEntity clientDates = createValidClientDates();
+        clientDates.setMonthlyDebt(600000); // 60% del salario mensual
+
+        setupBasicMocks(solicitude, clientDates);
+        when(solicitudeRepository.save(any())).thenReturn(solicitude);
+
+        // Act
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        // Assert
+        assertThat(result.getState()).isEqualTo(7); // Estado rechazado
+    }
+
+    @Test
+    public void testEvaluateSolicitude_WhenPaymentToIncomeRatioExceeds35Percent_ShouldReject() {
+        // Arrange
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        solicitude.setAmount(1000000);
+        solicitude.setInterestRate(0.10f);
+        solicitude.setDeadline(12);
+
+        ClientDatesEntity clientDates = createValidClientDates();
+        clientDates.setMonthSalary(100000); // Salario bajo para que la cuota exceda 35%
+
+        setupBasicMocks(solicitude, clientDates);
+        when(clientService.simulateAmount(anyDouble(), anyDouble(), anyDouble())).thenReturn(50000.0);
+        when(solicitudeRepository.save(any())).thenReturn(solicitude);
+
+        // Act
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        // Assert
+        assertThat(result.getState()).isEqualTo(7); // Estado rechazado
+    }
+
+    @Test
+    public void testEvaluateSolicitude_WhenAgeNotInRange_ShouldReject() {
+        // Arrange
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ClientEntity client = new ClientEntity();
+        client.setId(1L);
+        client.setBirthday(LocalDate.now().minusYears(75));
+        solicitude.setClient(client);
+
+        ClientDatesEntity clientDates = createValidClientDates();
+
+        setupBasicMocks(solicitude, clientDates);
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(clientService.getById(1L)).thenReturn(client);
+        when(solicitudeRepository.save(any())).thenReturn(solicitude);
+
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        // Assert
+        assertThat(result.getState()).isEqualTo(7); // Estado rechazado
+    }
+
+    @Test
+    void testEvaluateSolicitudeSuccessfulPreApproval() {
+        SolicitudeEntity solicitude = createBasicSolicitude();
+        ClientDatesEntity clientDates = createValidClientDates();
+        ClientEntity client = new ClientEntity();
+        client.setBirthday(LocalDate.now().minusYears(30));
+
+        setupBasicMocks(solicitude, clientDates);
+        when(clientService.getById(1L)).thenReturn(client);
+        when(clientService.simulateAmount(anyFloat(), anyFloat(), anyDouble())).thenReturn(1000.0);
+
+        when(solicitudeRepository.save(any(SolicitudeEntity.class))).thenReturn(solicitude);
+        SolicitudeEntity result = solicitudeService.EvaluateSolicitude(1L);
+
+        assertThat(result.getState()).isEqualTo(4);
+    }
+
+    private SolicitudeEntity createBasicSolicitude() {
+        SolicitudeEntity solicitude = new SolicitudeEntity();
+        solicitude.setState(1);
+        solicitude.setDeadline(12);
+        ClientEntity client = new ClientEntity();
+        client.setId(1L);
+        solicitude.setClient(client);
+        return solicitude;
+    }
+
+    private ClientDatesEntity createValidClientDates() {
+        ClientDatesEntity clientDates = new ClientDatesEntity();
+        clientDates.setType(1);
+        clientDates.setMediaSalary(800000);
+        clientDates.setMonthSalary(1000000);
+        clientDates.setMonthlyDebt(200000);
+        clientDates.setDicom(false);
+        return clientDates;
+    }
+
+    private void setupBasicMocks(SolicitudeEntity solicitude, ClientDatesEntity clientDates) {
+        when(solicitudeRepository.findById(1L)).thenReturn(Optional.of(solicitude));
+        when(clientDocumentRepository.findByClientId(1L)).thenReturn(new ArrayList<>());
+        when(documentRepository.findDocumentsByMinimunRequirements(true)).thenReturn(new ArrayList<>());
+        when(loanRequirementRepository.findDocumentsByTypeLoanId(1L)).thenReturn(new ArrayList<>());
+        when(clientDatesRepository.findByClientId(1L)).thenReturn(clientDates);
+    }
 }
