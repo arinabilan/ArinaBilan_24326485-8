@@ -2,7 +2,6 @@ package bank.app.appbank.packages.repositories;
 
 import bank.app.appbank.packages.entities.DocumentEntity;
 import bank.app.appbank.packages.entities.LoanRequirementEntity;
-import bank.app.appbank.packages.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

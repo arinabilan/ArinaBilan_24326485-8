@@ -1,7 +1,6 @@
 package bank.app.appbank.packages.services;
 
 import bank.app.appbank.packages.entities.ClientEntity;
-import bank.app.appbank.packages.entities.UserEntity;
 import bank.app.appbank.packages.repositories.ClientRepository;
 
 
