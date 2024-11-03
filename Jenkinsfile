@@ -6,7 +6,7 @@ pipeline {
     stages{
         stage('Build maven'){
             steps{
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/arinabilan/ArinaBilan_24326485-8']])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/arinabilan/ArinaBilan_24326485-8']])
                 bat 'mvn clean package'
             }
         }
