@@ -28,8 +28,8 @@ pipeline {
         stage('Push image to Docker Hub'){
             steps{
                 script{
-                   withCredentials([string(credentialsId: 'dhpswid', variable: 'dhpsw')]) {
-                        bat 'docker login -u aribakan -p %dhpsw%'
+                   withCredentials([string(credentialsId: 'docker-token-id', variable: 'DOCKER_TOKEN')]) {
+                        bat 'echo %DOCKER_TOKEN% | docker login -u aribakan --password-stdin'
                    }
                    bat 'docker push aribakan/bank-service:latest'
                 }
