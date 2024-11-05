@@ -19,7 +19,7 @@ public class FileUploadService {
 
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        String uploadDir = "/uploads/";
+        String uploadDir = "uploads/";
 
         // Crear la carpeta uploads si no existe
         Path uploadsPath = Paths.get(uploadDir);
