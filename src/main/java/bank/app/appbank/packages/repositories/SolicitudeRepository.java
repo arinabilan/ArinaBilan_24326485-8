@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SolicitudeRepository extends JpaRepository<SolicitudeEntity, Long> {
 
     @Query(value = "SELECT * FROM solicitudes WHERE solicitudes.id = :id", nativeQuery = true)
     SolicitudeEntity findBySolicitudeId(@Param("id") Long id);
+
+    public List<SolicitudeEntity> findByClientId(Long id);
 
 }

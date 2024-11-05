@@ -39,4 +39,10 @@ public class SolicitudeController {
         SolicitudeEntity solicitudes = solicitudeService.EvaluateSolicitude(id);
         return ResponseEntity.ok(solicitudes);
     }
+
+    @GetMapping("/{id}/client")
+    public ResponseEntity<List<SolicitudeEntity>> solicitudeByClient(@PathVariable("id") Long id) {
+        List<SolicitudeEntity> solicitudes = solicitudeService.getAllSolicitudesByClientId(id);
+        return ResponseEntity.ok(solicitudes);
+    }
 }

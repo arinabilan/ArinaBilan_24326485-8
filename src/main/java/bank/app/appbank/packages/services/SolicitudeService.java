@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SolicitudeService {
@@ -26,6 +27,10 @@ public class SolicitudeService {
 
     public ArrayList<SolicitudeEntity> getAllSolicitudes() {
         return (ArrayList<SolicitudeEntity>) solicitudeRepository.findAll();
+    }
+
+    public List<SolicitudeEntity> getAllSolicitudesByClientId(Long clientId) {
+        return solicitudeRepository.findByClientId(clientId);
     }
 
     public SolicitudeEntity saveSolicitude(SolicitudeEntity solicitude) {
