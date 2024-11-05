@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SolicitudeService {
@@ -68,13 +69,23 @@ public class SolicitudeService {
             return solicitude;
         }
         Long clientId = solicitude.getClient().getId();
+        Long loanId = solicitude.getLoanType().getId(); //agregue esta linea
         ArrayList<ClientDocumentEntity> documentsClient =  clientDocumentRepository.findByClientId(clientId);
+        List<Long> documentIds = documentsClient.stream()
+                .map(clientDocument -> clientDocument.getDocument().getId())
+                .collect(Collectors.toList());
 
         // 1 - Verifica si la documentación mínima requerida + la documentación del tipo de prestamo está completa
         ArrayList<DocumentEntity> documentsMinimun = documentRepository.findDocumentsByMinimunRequirements(true);
-        boolean documentsMinimunRequired = documentsClient.isEmpty() && documentsMinimun.isEmpty() || documentsMinimun.contains(documentsClient);
-        ArrayList<DocumentEntity> documentByLoan = (ArrayList<DocumentEntity>) loanRequirementRepository.findDocumentsByTypeLoanId(clientId);
-        boolean documentsLLoanRequired = documentsClient.isEmpty() && documentByLoan.isEmpty() || documentByLoan.contains(documentsClient);
+        List<Long> documentIds1 = documentsMinimun.stream()
+                .map(DocumentEntity::getId)
+                .collect(Collectors.toList());
+        boolean documentsMinimunRequired = documentsClient.isEmpty() && documentsMinimun.isEmpty() || documentIds.containsAll(documentIds1); //agregue All
+        ArrayList<DocumentEntity> documentByLoan = (ArrayList<DocumentEntity>) loanRequirementRepository.findDocumentsByTypeLoanId(loanId); // cambie de clientId a loanId
+        List<Long> documentIdsByLoan = documentByLoan.stream()
+                .map(DocumentEntity::getId)
+                .collect(Collectors.toList());
+        boolean documentsLLoanRequired = documentsClient.isEmpty() && documentByLoan.isEmpty() || documentIds.containsAll(documentIdsByLoan); //agregue All
         if (!documentsMinimunRequired || !documentsLLoanRequired) {
             solicitude.setState(2);
             return solicitudeRepository.save(solicitude);
@@ -100,7 +111,7 @@ public class SolicitudeService {
         if (!((clientDates.getType() == 1 &&
                 clientDates.getMediaSalary() > 750000 &&
                 clientDates.getMonthSalary() - clientDates.getMonthlyDebt() > 500000)
-            || (clientDates.getType() == 2 && clientDates.getInitialContract() / 12 > 1 ))) {
+            || (clientDates.getType() == 2 && clientDates.getInitialContract() > 1 ))) {
             solicitude.setState(7); // rechazada
             return solicitudeRepository.save(solicitude);
         }
@@ -120,7 +131,7 @@ public class SolicitudeService {
         }
 
         solicitude.setState(4); // pre-aprobada
-        return solicitude;
+        return solicitudeRepository.save(solicitude);
     }
 
 }
